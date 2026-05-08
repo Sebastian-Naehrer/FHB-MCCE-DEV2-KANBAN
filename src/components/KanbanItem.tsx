@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -26,42 +26,15 @@ interface KanbanItemProps {
 }
 
 function KanbanItem({ item, onSave, onCancel }: KanbanItemProps) {
-  const [itemData, setItemData] = useState<ItemData>({
-    title: '',
-    description: '',
-    type: 'User Story', // Default value
-    estimate: 1, // Default value
-    state: 'Open', // Default value
-    assigned_user: '',
-    priority: 'Low', // Default value
-  });
-
-  useEffect(() => {
-    if (item) {
-      // Populate form fields if item prop is provided (editing)
-      setItemData({
-        title: item.title,
-        description: item.description,
-        type: item.type,
-        estimate: item.estimate,
-        state: item.state,
-        assigned_user: item.assigned_user,
-        priority: item.priority,
-      });
-    } else {
-      // Clear form fields if no item prop (creating new)
-      setItemData({
-        title: '',
-        description: '',
-        type: 'User Story',
-        estimate: 1,
-        state: 'Open',
-        assigned_user: '',
-        priority: 'Low',
-      });
-    }
-  }, [item]);
-
+  const [itemData, setItemData] = useState<ItemData>(() => ({
+    title: item?.title ?? '',
+    description: item?.description ?? '',
+    type: item?.type ?? 'User Story',
+    estimate: item?.estimate ?? 1,
+    state: item?.state ?? 'Open',
+    assigned_user: item?.assigned_user ?? '',
+    priority: item?.priority ?? 'Low',
+  }));
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -135,9 +108,9 @@ function KanbanItem({ item, onSave, onCancel }: KanbanItemProps) {
       toast.success(`Item ${item ? 'updated' : 'created'} successfully!`);
       onSave(); // Notify parent component to refresh/close form
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving item:', error);
-      toast.error(`Failed to save item: ${error.message}`);
+          toast.error(`Failed to save item: ${(error as Error).message}`);
     }
   };
 
